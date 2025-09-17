@@ -1,3 +1,5 @@
+mmmmm
+
 # 🌞 Déterminer quel algorithme de chiffrement utiliser pour vos clés
 ## Raisons principales et source fiable qui explique pourquoi on évite RSA désormais (pour les connexions SSH notamment)
 •	Le chiffrement/déchiffrement RSA est plus lent que l'ECC en raison des opérations mathématiques impliquées. (Source https://www.sslinsights.com)
@@ -606,3 +608,118 @@ kex_exchange_identification: Connection closed by remote host
 Connection closed by 51.142.195.23 port 2222
 PS C:\Program Files\Terraform>
 ```
+## 🌞 Donner un nom DNS à votre VM
+```bash
+Terraform will perform the following actions:
+
+  # azurerm_public_ip.main will be updated in-place
+  ~ resource "azurerm_public_ip" "main" {
+      + domain_name_label       = "maitre-demo"
+        id                      = "/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/publicIPAddresses/vm-ip"
+        name                    = "vm-ip"
+        tags                    = {}
+        # (12 unchanged attributes hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+azurerm_public_ip.main: Modifying... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/publicIPAddresses/vm-ip]
+azurerm_public_ip.main: Modifications complete after 5s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/publicIPAddresses/vm-ip]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.
+````
+
+
+# 🌞 Un ptit output nan 
+
+créez un fichier outputs.tf à côté de votre main.tf
+doit afficher l'IP publique et le nom DNS de la VM
+```Bash
+output "public_ip_address" {
+  description = "Adresse IP publique de la VM"
+  value       = azurerm_public_ip.main.ip_address
+}
+
+output "public_fqdn" {
+  description = "Nom DNS public (FQDN) de la VM"
+  value       = azurerm_public_ip.main.fqdn
+}
+````
+
+
+# 🌞 Proofs ! Donnez moi :
+```Bash
+Changes to Outputs:
+  + public_fqdn       = "maitre-demo.uksouth.cloudapp.azure.com"
+  + public_ip_address = "51.142.195.23"
+
+You can apply this plan to save these new output values to the Terraform state, without changing any real infrastructure.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+public_fqdn = "maitre-demo.uksouth.cloudapp.azure.com"
+public_ip_address = "51.142.195.23"
+````
+
+
+# une commande ssh fonctionnelle vers le nom de domaine (pas l'IP)
+```bash
+PS C:\Program Files\Terraform> ssh -i C:\Users\DELL\.ssh\cloud_tp1 -p 2222  MASTER@maitre-demo.uksouth.cloudapp.azure.com
+The authenticity of host '[maitre-demo.uksouth.cloudapp.azure.com]:2222 ([51.142.195.23]:2222)' can't be established.
+ED25519 key fingerprint is SHA256:sBat8kZsNojzAbwOXBgFVrotvYZI+W9eAyg2MFubDBA.
+This host key is known by the following other names/addresses:
+    C:\Users\DELL/.ssh/known_hosts:7: 51.142.195.23
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '[maitre-demo.uksouth.cloudapp.azure.com]:2222' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-1089-azure x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Wed Sep 17 13:25:07 UTC 2025
+
+  System load:  0.0               Processes:             110
+  Usage of /:   6.5% of 28.89GB   Users logged in:       0
+  Memory usage: 31%               IPv4 address for eth0: 10.0.1.4
+  Swap usage:   0%
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Infrastructure is not enabled.
+
+41 updates can be applied immediately.
+31 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+44 additional security updates can be applied with ESM Infra.
+Learn more about enabling ESM Infra service for Ubuntu 20.04 at
+https://ubuntu.com/20-04
+
+New release '22.04.5 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+Last login: Wed Sep 17 08:55:01 2025 from 209.206.8.251
+````
+
+
+# 🌞 Compléter votre plan Terraform pour déployer du Blob Storage pour votre VM
