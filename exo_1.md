@@ -176,32 +176,433 @@ status: done
 
 # 🌞 Utilisez Terraform pour créer une VM dans Azure 
 ```bash
-PS C:\Program Files\Terraform> terraform init
-Initializing the backend...
-Initializing provider plugins...
-- Reusing previous version of hashicorp/azurerm from the dependency lock file
-- Using previously-installed hashicorp/azurerm v4.43.0
-
-Terraform has been successfully initialized!
-
-You may now begin working with Terraform. Try running "terraform plan" to see
-any changes that are required for your infrastructure. All Terraform commands
-should now work.
-
-If you ever set or change modules or backend configuration for Terraform,
-rerun this command to reinitialize your working directory. If you forget, other
-commands will detect it and remind you to do so if necessary.
-
 PS C:\Program Files\Terraform> terraform apply
-azurerm_resource_group.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/LEGENDE]
-azurerm_virtual_network.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/LEGENDE/providers/Microsoft.Network/virtualNetworks/vm-vnet]
-azurerm_subnet.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/LEGENDE/providers/Microsoft.Network/virtualNetworks/vm-vnet/subnets/vm-subnet]
-azurerm_network_interface.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/LEGENDE/providers/Microsoft.Network/networkInterfaces/vm-nic]
-azurerm_linux_virtual_machine.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/LEGENDE/providers/Microsoft.Compute/virtualMachines/super-vm]
+azurerm_resource_group.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING]
+azurerm_virtual_network.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet]
+azurerm_subnet.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet/subnets/vm-subnet]
 
-No changes. Your infrastructure matches the configuration.
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
 
-Terraform has compared your real infrastructure against your configuration and found no differences, so no changes are needed.
+Terraform will perform the following actions:
 
-Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+  # azurerm_linux_virtual_machine.main will be created
+  + resource "azurerm_linux_virtual_machine" "main" {
+      + admin_username                                         = "MASTER"
+      + allow_extension_operations                             = (known after apply)
+      + bypass_platform_safety_checks_on_user_schedule_enabled = false
+      + computer_name                                          = (known after apply)
+      + disable_password_authentication                        = (known after apply)
+      + disk_controller_type                                   = (known after apply)
+      + extensions_time_budget                                 = "PT1H30M"
+      + id                                                     = (known after apply)
+      + location                                               = "uksouth"
+      + max_bid_price                                          = -1
+      + name                                                   = "super-vm"
+      + network_interface_ids                                  = (known after apply)
+      + os_managed_disk_id                                     = (known after apply)
+      + patch_assessment_mode                                  = (known after apply)
+      + patch_mode                                             = (known after apply)
+      + platform_fault_domain                                  = -1
+      + priority                                               = "Regular"
+      + private_ip_address                                     = (known after apply)
+      + private_ip_addresses                                   = (known after apply)
+      + provision_vm_agent                                     = (known after apply)
+      + public_ip_address                                      = (known after apply)
+      + public_ip_addresses                                    = (known after apply)
+      + resource_group_name                                    = "KING"
+      + size                                                   = "Standard_B1s"
+      + virtual_machine_id                                     = (known after apply)
+      + vm_agent_platform_updates_enabled                      = (known after apply)
+
+      + admin_ssh_key {
+          + public_key = <<-EOT
+                ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILsBG3cpnzS/vPQ/7TUzvVhrY0wJPx6j+YF0eq2MVx6q dell@DESKTOP-8S6D2T8
+            EOT
+          + username   = "MASTER"
+        }
+
+      + os_disk {
+          + caching                   = "ReadWrite"
+          + disk_size_gb              = (known after apply)
+          + id                        = (known after apply)
+          + name                      = "vm-os-disk"
+          + storage_account_type      = "Standard_LRS"
+          + write_accelerator_enabled = false
+        }
+
+      + source_image_reference {
+          + offer     = "0001-com-ubuntu-server-focal"
+          + publisher = "Canonical"
+          + sku       = "20_04-lts"
+          + version   = "latest"
+        }
+
+      + termination_notification (known after apply)
+    }
+
+  # azurerm_network_interface.main will be created
+  + resource "azurerm_network_interface" "main" {
+      + accelerated_networking_enabled = false
+      + applied_dns_servers            = (known after apply)
+      + id                             = (known after apply)
+      + internal_domain_name_suffix    = (known after apply)
+      + ip_forwarding_enabled          = false
+      + location                       = "uksouth"
+      + mac_address                    = (known after apply)
+      + name                           = "vm-nic"
+      + private_ip_address             = (known after apply)
+      + private_ip_addresses           = (known after apply)
+      + resource_group_name            = "KING"
+      + virtual_machine_id             = (known after apply)
+
+      + ip_configuration {
+          + gateway_load_balancer_frontend_ip_configuration_id = (known after apply)
+          + name                                               = "internal"
+          + primary                                            = (known after apply)
+          + private_ip_address                                 = (known after apply)
+          + private_ip_address_allocation                      = "Dynamic"
+          + private_ip_address_version                         = "IPv4"
+          + public_ip_address_id                               = (known after apply)
+          + subnet_id                                          = "/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet/subnets/vm-subnet"
+        }
+    }
+
+  # azurerm_public_ip.main will be created
+  + resource "azurerm_public_ip" "main" {
+      + allocation_method       = "Static"
+      + ddos_protection_mode    = "VirtualNetworkInherited"
+      + fqdn                    = (known after apply)
+      + id                      = (known after apply)
+      + idle_timeout_in_minutes = 4
+      + ip_address              = (known after apply)
+      + ip_version              = "IPv4"
+      + location                = "uksouth"
+      + name                    = "vm-ip"
+      + resource_group_name     = "KING"
+      + sku                     = "Standard"
+      + sku_tier                = "Regional"
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+azurerm_public_ip.main: Creating...
+azurerm_public_ip.main: Creation complete after 4s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/publicIPAddresses/vm-ip]
+azurerm_network_interface.main: Creating...
+azurerm_network_interface.main: Creation complete after 3s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/networkInterfaces/vm-nic]
+azurerm_linux_virtual_machine.main: Creating...
+azurerm_linux_virtual_machine.main: Still creating... [00m10s elapsed]
+azurerm_linux_virtual_machine.main: Creation complete after 13s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Compute/virtualMachines/super-vm]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+```
+
+# 🌞 Ajouter un NSG à votre déploiement Terraform
+```bash
+
+# Network Security Group
+resource "azurerm_network_security_group" "main" {
+  name                = "nsg-main"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+# Règle SSH dans le NSG
+resource "azurerm_network_security_rule" "ssh" {
+  name                        = "SSH"
+  priority                    = 1001
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "22"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+}
+
+# Associer le NSG au Subnet
+resource "azurerm_subnet_network_security_group_association" "main" {
+  subnet_id                 = azurerm_subnet.main.id
+  network_security_group_id = azurerm_network_security_group.main.id
+}
+```
+
+# 🌞 Prouver que ça fonctionne, rendu attendu
+```bash
+PS C:\Program Files\Terraform> terraform apply
+azurerm_resource_group.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING]
+azurerm_public_ip.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/publicIPAddresses/vm-ip]
+azurerm_virtual_network.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet]
+azurerm_subnet.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet/subnets/vm-subnet]
+azurerm_network_interface.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/networkInterfaces/vm-nic]
+azurerm_linux_virtual_machine.main: Refreshing state... [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Compute/virtualMachines/super-vm]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  ## azurerm_network_security_group.main will be created
+  + resource "azurerm_network_security_group" "main" {
+      + id                  = (known after apply)
+      + location            = "uksouth"
+      + name                = "nsg-main"
+      + resource_group_name = "KING"
+      + security_rule       = (known after apply)
+    }
+
+  ## azurerm_network_security_rule.ssh will be created
+  + resource "azurerm_network_security_rule" "ssh" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "*"
+      + destination_port_range      = "22"
+      + direction                   = "Inbound"
+      + id                          = (known after apply)
+      + name                        = "SSH"
+      + network_security_group_name = "nsg-main"
+      + priority                    = 1001
+      + protocol                    = "Tcp"
+      + resource_group_name         = "KING"
+      + source_address_prefix       = "*"
+      + source_port_range           = "*"
+    }
+
+  ## azurerm_subnet_network_security_group_association.main will be created
+  + resource "azurerm_subnet_network_security_group_association" "main" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = "/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet/subnets/vm-subnet"
+    }
+
+Plan: 3 to add, 0 to change, 0 to destroy.
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+azurerm_network_security_group.main: Creating...
+azurerm_network_security_group.main: Creation complete after 3s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/networkSecurityGroups/nsg-main]
+azurerm_subnet_network_security_group_association.main: Creating...
+azurerm_network_security_rule.ssh: Creating...
+azurerm_network_security_rule.ssh: Creation complete after 2s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/networkSecurityGroups/nsg-main/securityRules/SSH]
+azurerm_subnet_network_security_group_association.main: Creation complete after 7s [id=/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/virtualNetworks/vm-vnet/subnets/vm-subnet]
+
+Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+```
+
+### une commande az pour obtenir toutes les infos liées à la VM
+````bash
+PS C:\Program Files\Terraform> az vm show  --resource-group KING  --name super-vm
+{
+  "additionalCapabilities": null,
+  "applicationProfile": null,
+  "availabilitySet": null,
+  "billingProfile": null,
+  "capacityReservation": null,
+  "diagnosticsProfile": {
+    "bootDiagnostics": {
+      "enabled": false,
+      "storageUri": null
+    }
+  },
+  "etag": "\"1\"",
+  "evictionPolicy": null,
+  "extendedLocation": null,
+  "extensionsTimeBudget": "PT1H30M",
+  "hardwareProfile": {
+    "vmSize": "Standard_B1s",
+    "vmSizeProperties": null
+  },
+  "host": null,
+  "hostGroup": null,
+  "id": "/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Compute/virtualMachines/super-vm",
+  "identity": null,
+  "instanceView": null,
+  "licenseType": null,
+  "location": "uksouth",
+  "managedBy": null,
+  "name": "super-vm",
+  "networkProfile": {
+    "networkApiVersion": null,
+    "networkInterfaceConfigurations": null,
+    "networkInterfaces": [
+      {
+        "deleteOption": null,
+        "id": "/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Network/networkInterfaces/vm-nic",
+        "primary": true,
+        "resourceGroup": "KING"
+      }
+    ]
+  },
+  "osProfile": {
+    "adminPassword": null,
+    "adminUsername": "MASTER",
+    "allowExtensionOperations": true,
+    "computerName": "super-vm",
+    "customData": null,
+    "linuxConfiguration": {
+      "disablePasswordAuthentication": true,
+      "enableVmAgentPlatformUpdates": null,
+      "patchSettings": {
+        "assessmentMode": "ImageDefault",
+        "automaticByPlatformSettings": null,
+        "patchMode": "ImageDefault"
+      },
+      "provisionVmAgent": true,
+      "ssh": {
+        "publicKeys": [
+          {
+            "keyData": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILsBG3cpnzS/vPQ/7TUzvVhrY0wJPx6j+YF0eq2MVx6q dell@DESKTOP-8S6D2T8\r\n",
+            "path": "/home/MASTER/.ssh/authorized_keys"
+          }
+        ]
+      }
+    },
+    "requireGuestProvisionSignal": true,
+    "secrets": [],
+    "windowsConfiguration": null
+  },
+  "placement": null,
+  "plan": null,
+  "platformFaultDomain": null,
+  "priority": "Regular",
+  "provisioningState": "Succeeded",
+  "proximityPlacementGroup": null,
+  "resourceGroup": "KING",
+  "resources": null,
+  "scheduledEventsPolicy": null,
+  "scheduledEventsProfile": null,
+  "securityProfile": null,
+  "storageProfile": {
+    "alignRegionalDisksToVmZone": null,
+    "dataDisks": [],
+    "diskControllerType": null,
+    "imageReference": {
+      "communityGalleryImageId": null,
+      "exactVersion": "20.04.202505200",
+      "id": null,
+      "offer": "0001-com-ubuntu-server-focal",
+      "publisher": "Canonical",
+      "sharedGalleryImageId": null,
+      "sku": "20_04-lts",
+      "version": "latest"
+    },
+    "osDisk": {
+      "caching": "ReadWrite",
+      "createOption": "FromImage",
+      "deleteOption": "Detach",
+      "diffDiskSettings": null,
+      "diskSizeGb": 30,
+      "encryptionSettings": null,
+      "image": null,
+      "managedDisk": {
+        "diskEncryptionSet": null,
+        "id": "/subscriptions/4743a650-180b-4be1-971f-f92f2fa62d0e/resourceGroups/KING/providers/Microsoft.Compute/disks/vm-os-disk",
+        "resourceGroup": "KING",
+        "securityProfile": null,
+        "storageAccountType": "Standard_LRS"
+      },
+      "name": "vm-os-disk",
+      "osType": "Linux",
+      "vhd": null,
+      "writeAcceleratorEnabled": false
+    }
+  },
+  "tags": {},
+  "timeCreated": "2025-09-16T13:00:23.890969+00:00",
+  "type": "Microsoft.Compute/virtualMachines",
+  "userData": null,
+  "virtualMachineScaleSet": null,
+  "vmId": "548c0016-ce14-4bfc-a835-0b540795a8df",
+  "zones": null
+}
+````
+### une commande ssh fonctionnelle vers l'IP publique de la VM
+````Bash
+PS C:\Program Files\Terraform> ssh MASTER@51.142.195.23
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 5.15.0-1089-azure x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Wed Sep 17 08:54:59 UTC 2025
+
+  System load:  0.1               Processes:             110
+  Usage of /:   5.9% of 28.89GB   Users logged in:       0
+  Memory usage: 31%               IPv4 address for eth0: 10.0.1.4
+  Swap usage:   0%
+
+ * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
+   just raised the bar for easy, resilient and secure K8s cluster deployment.
+
+   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+
+MASTER@super-vm:~$
+````
+### modifiez le port d'écoute du serveur OpenSSH sur la VM pour le port 2222/tcp
+```bash
+Include /etc/ssh/sshd_config.d/*.conf
+
+#Port 2222
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+```
+### prouvez que le serveur OpenSSH écoute sur ce nouveau port (avec une commande ss sur la VM)
+```bash
+MASTER@super-vm:~$ sudo ss -tlnp | grep sshd
+LISTEN    0         128                0.0.0.0:2222             0.0.0.0:*        users:(("sshd",pid=19066,fd=3))
+LISTEN    0         128                   [::]:2222                [::]:*        users:(("sshd",pid=19066,fd=4))
+````
+
+### prouvez qu'une nouvelle connexion sur ce port 2222/tcp ne fonctionne pas à cause du NSG
+```bash
+PS C:\Program Files\Terraform> ssh -i C:\Users\DELL\.ssh\cloud_tp1 -p 2222 MASTER@51.142.195.23
+kex_exchange_identification: Connection closed by remote host
+Connection closed by 51.142.195.23 port 2222
+PS C:\Program Files\Terraform>
 ```
