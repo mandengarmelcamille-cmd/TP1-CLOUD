@@ -723,3 +723,117 @@ Last login: Wed Sep 17 08:55:01 2025 from 209.206.8.251
 
 
 # 🌞 Compléter votre plan Terraform pour déployer du Blob Storage pour votre VM
+```bash
+# storage.tf
+
+resource "azurerm_storage_account" "main" {
+  name                     = var.storage_account_name
+  resource_group_name      = azurerm_resource_group.main.name
+  location                 = azurerm_resource_group.main.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "meowcontainer" {
+  name                  = var.storage_container_name
+  storage_account_id = azurerm_storage_account.main.id
+  container_access_type = "private"
+}
+
+data "azurerm_virtual_machine" "main" {
+  name                = azurerm_linux_virtual_machine.main.name
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+resource "azurerm_role_assignment" "vm_blob_access" {
+  principal_id = data.azurerm_virtual_machine.main.identity[0].principal_id
+  role_definition_name = "Storage Blob Data Contributor"
+  scope                = azurerm_storage_account.main.id
+
+  depends_on = [
+    azurerm_linux_virtual_machine.main
+  ]
+}
+```
+
+# 🌞 Prouvez que tout est bien configuré, depuis la VM Azure
+```Bash
+MASTER@super-vm:~$ azcopy --version
+azcopy version 10.30.1
+MASTER@super-vm:~$ azcopy login
+INFO: Authentication is required. To sign in, open the webpage https://microsoft.com/devicelogin and enter the code LC4KX263Y to authenticate.
+
+INFO: Logging in under the "Common" tenant. This will log the account in under its home tenant.
+INFO: If you plan to use AzCopy with a B2B account (where the account's home tenant is separate from the tenant of the target storage account), please sign in under the target tenant with --tenant-id
+INFO: Login succeeded.
+
+MASTER@super-vm:/home$ azcopy copy "/home/MASTER/testfichier.txt" "https://maitremandengbig.blob.core.windows.net/newcontainermandeng" --recursive=true
+INFO: Scanning...
+INFO: Autologin not specified.
+INFO: Authenticating to destination using Azure AD
+INFO: Any empty folders will not be processed, because source and/or destination doesn't have full folder support
+
+Job 97c0bcf6-fb00-e242-5c81-3d116c80ef57 has started
+Log file is located at: /home/MASTER/.azcopy/97c0bcf6-fb00-e242-5c81-3d116c80ef57.log
+
+INFO: Authentication failed, it is either not correct, or expired, or does not have the correct permission PUT https://maitremandengbig.blob.core.windows.net/newcontainermandeng/testfichier.txt
+--------------------------------------------------------------------------------
+RESPONSE 403: 403 This request is not authorized to perform this operation using this permission.
+ERROR CODE: AuthorizationPermissionMismatch
+--------------------------------------------------------------------------------
+﻿<?xml version="1.0" encoding="utf-8"?><Error><Code>AuthorizationPermissionMismatch</Code><Message>This request is not authorized to perform this operation using this permission.
+RequestId:5397335d-801e-0023-7ff1-2a2bd9000000
+Time:2025-09-21T12:19:26.7892216Z</Message></Error>
+--------------------------------------------------------------------------------
+
+0.0 %, 0 Done, 1 Failed, 0 Pending, 0 Skipped, 1 Total, 2-sec Throughput (Mb/s): 0.0001
+
+
+Job 97c0bcf6-fb00-e242-5c81-3d116c80ef57 summary
+Elapsed Time (Minutes): 0.0335
+Number of File Transfers: 1
+Number of Folder Property Transfers: 0
+Number of Symlink Transfers: 0
+Total Number of Transfers: 1
+Number of File Transfers Completed: 0
+Number of Folder Transfers Completed: 0
+Number of File Transfers Failed: 1
+Number of Folder Transfers Failed: 0
+Number of File Transfers Skipped: 0
+Number of Folder Transfers Skipped: 0
+Number of Symbolic Links Skipped: 0
+Number of Hardlinks Converted: 0
+Number of Special Files Skipped: 0
+Total Number of Bytes Transferred: 0
+Final Job Status: Cancelled
+MASTER@super-vm:/home$ azcopy copy  "https://maitremandengbig.blob.core.windows.net/newcontainermandeng/testfichier.txt" "/home/MASTER/test_download.txt"
+INFO: Scanning...
+INFO: Autologin not specified.
+INFO: Authenticating to source using Azure AD
+INFO: Any empty folders will not be processed, because source and/or destination doesn't have full folder support
+
+failed to perform copy command due to error: cannot start job due to error cannot list files due to reason HEAD https://maitremandengbig.blob.core.windows.net/newcontainermandeng/testfichier.txt
+--------------------------------------------------------------------------------
+RESPONSE 403: 403 This request is not authorized to perform this operation using this permission.
+ERROR CODE: AuthorizationPermissionMismatch
+--------------------------------------------------------------------------------
+Response contained no body
+--------------------------------------------------------------------------------
+
+MASTER@super-vm:/home$ az role assignment list
+````
+
+# 🌞 Déterminez comment azcopy login --identity vous a authentifié
+```Bash
+Quand vous exécutez azcopy login --identity, AzCopy demande à l’endpoint de Managed Identity (IMDS / MSI) un jeton OAuth pour la ressource Azure Storage (https://storage.azure.com/), reçoit un token (JWT) émis par Microsoft Entra ID, le met en cache (store sécurisé local) et l’utilise ensuite comme Authorization: Bearer <token> pour appeler le service Blob/File
+````
+# 🌞 Requêtez un JWT d'authentification auprès du service que vous venez d'identifier, manuellement
+```Bash
+MASTER@super-vm:~$ curl -H  "Metadata : true" "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://storage.azure.com/"
+{"access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkhTMjNiN0RvN1RjYVUxUm9MSHdwSXEyNFZZZyIsImtpZCI6IkhTMjNiN0RvN1RjYVUxUm9MSHdwSXEyNFZZZyJ9.eyJhdWQiOiJodHRwczovL3N0b3JhZ2UuYXp1cmUuY29tLyIsImlzcyI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0LzQxMzYwMGNmLWJkNGUtNGM3Yy04YTYxLTY5ZTczY2RkZjczMS8iLCJpYXQiOjE3NTg0NzU5ODIsIm5iZiI6MTc1ODQ3NTk4MiwiZXhwIjoxNzU4NTYyNjgyLCJhaW8iOiJrMlJnWUtncE9ISTQ2NVpBVWd0SHdvT1crbjRPQUE9PSIsImFwcGlkIjoiZjI2NTY4NWMtNTVlZS00Y2UyLWIwOTYtOGJmYzBiMjYzNDI1IiwiYXBwaWRhY3IiOiIyIiwiaWRwIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvNDEzNjAwY2YtYmQ0ZS00YzdjLThhNjEtNjllNzNjZGRmNzMxLyIsImlkdHlwIjoiYXBwIiwib2lkIjoiMmNjNjFkOGUtZTk3Yy00ZTdlLWI3NzItNzVkMDBjZjA3YWEyIiwicmgiOiIxLkFUc0F6d0EyUVU2OWZFeUtZV25uUE4zM01ZR21CdVRVODZoQ2tMYkNzQ2xKZXZFVkFRQTdBQS4iLCJzdWIiOiIyY2M2MWQ4ZS1lOTdjLTRlN2UtYjc3Mi03NWQwMGNmMDdhYTIiLCJ0aWQiOiI0MTM2MDBjZi1iZDRlLTRjN2MtOGE2MS02OWU3M2NkZGY3MzEiLCJ1dGkiOiJPN2otYVVNQ1MweTVrYTAxUVB3REFRIiwidmVyIjoiMS4wIiwieG1zX2Z0ZCI6IlFqQmxHX0hoZVdDdjUtM2dOdjc3ZFdDY1hfRlJQVFlDdlptZ1ZuWm40NEFCZFd0emIzVjBhQzFrYzIxeiIsInhtc19pZHJlbCI6IjcgMzAiLCJ4bXNfbWlyaWQiOiIvc3Vic2NyaXB0aW9ucy80NzQzYTY1MC0xODBiLTRiZTEtOTcxZi1mOTJmMmZhNjJkMGUvcmVzb3VyY2Vncm91cHMvS0lORy9wcm92aWRlcnMvTWljcm9zb2Z0LkNvbXB1dGUvdmlydHVhbE1hY2hpbmVzL3N1cGVyLXZtIiwieG1zX3JkIjoiMC40MkxsWUJKaXRCWVM0ZUFVRWxEcDliVmJ1ZTIyNzZRdjZib3ltazE2UUZFT0lZSEdaV3hQcm54ZTRUUmgyNkVObXA1Vkh3RSIsInhtc190ZGJyIjoiRVUifQ.ZrKnzJetABJ9T9q1Yn-zNM14FLI4CdPYq3ORmiLtcFuYiGIXxNsd2BvibN_C1AMiB06CEVp-t6XQQYkpaw_iWiqBfT15VRFJIUmlJXLv6uP0YVU-gODoOI2Fnumpm6hwa46S831YVxE7PV6BZ9TqjZkyVFaaVZsWK2jntPCRQAzJ4UKuXG8pWk8dcZcGk5xSA37mMhpFzBHE3ivOMVPUJOA17Xcx3U_2S6AgsYkhgKZvagqTNZFWkNozheTbOepNLlHLiBRzwnGjBrYY9ixhfVwNxAAIIwO1lyRqBXX4Sx8t6rX2tC_zj3hNVwf4HXRB3c5dq2YVtPLEAszbn8FGIw","client_id":"f265685c-55ee-4ce2-b096-8bfc0b263425","expires_in":"86400","expires_on":"1758562682","ext_expires_in":"86399","not_before":"1758475982","resource":"https://storage.azure.com/","token_type":"Bearer"}
+````
+
+# 🌞 Expliquez comment l'IP 169.254.169.254 peut être joignable
+````Bash
+L’adresse 169.254.169.254 n’est pas une “vraie” IP publique ni une IP que vous pourriez pinger depuis Internet. C’est une adresse spéciale de lien local (link-local) réservée par Microsoft et utilisée comme endpoint de métadonnées à l’intérieur d’Azure (mais aussi d’AWS, GCP, etc. chacun a choisi la même IP).
+````
